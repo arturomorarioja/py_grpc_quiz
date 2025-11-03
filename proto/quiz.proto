@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+service Quiz {
+  // Server to client streaming: push questions and status
+  rpc StreamQuestions(Join) returns (stream ServerEvent);
+
+  // Client to Server request/response: one-shot answer
+  rpc SubmitAnswer(Answer) returns (Ack);
+}
+
+message Join {
+  string player_id = 1;
+  string game_id   = 2;
+  uint64 last_seen_seq = 3; // for resuming, or 0 to start fresh
+}
+
+message ServerEvent {
+  uint64 seq = 1;
+  oneof event {
+    Question question   = 2;
+    RoundEnd round_end  = 3;
+    ScoreUpdate score   = 4;
+  }
+}
+
+message Question {
+  string question_id        = 1;
+  string text               = 2;
+  repeated string choices   = 3;
+  int32 seconds_left        = 4; // informational
+}
+
+message Answer {
+  string player_id   = 1;
+  string game_id     = 2;
+  string question_id = 3;
+  string answer_id   = 4;   // client-generated for idempotency
+  int32  choice_idx  = 5;   // index in Question.choices
+}
+
+message Ack {
+  bool   accepted = 1;
+  string reason   = 2; // e.g., "ok", "duplicate", "invalid", "late"
+  int32  total    = 3; // current score after the acknowledged answer
+}
+
+message ScoreUpdate {
+  string player_id = 1;
+  int32  total     = 2;
+}
+
+message RoundEnd {}
