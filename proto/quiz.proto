@@ -19,7 +19,6 @@ message ServerEvent {
   oneof event {
     Question question   = 2;
     RoundEnd round_end  = 3;
-    ScoreUpdate score   = 4;
   }
 }
 
