@@ -3,7 +3,7 @@ Example of a gRPC server and client using Python.
 
 The server streams a series of questions with multiple answers (server to client streaming RPC). The client answers the said questions (client to server unary RPC).
 
-The questions and answers are in `data/questions.json`.
+The questions and answers are in `quiz/data/questions.json`.
 
 ## Instructions
 1. Generate `quiz/quiz_pb2.py` and `quiz/quiz_pb2_grpc.py` from `proto/quiz.proto`:
