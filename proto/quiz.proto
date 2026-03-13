@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+service Quiz {
+
+  // Server → Client: stream quiz questions
+  rpc StreamQuestions(Join) returns (stream ServerEvent);
+
+  // Client → Server: submit one answer
+  rpc SubmitAnswer(Answer) returns (Ack);
+
+}
+
+message Join {
+  string player_id = 1;
+  string game_id = 2;
+  uint64 last_seen_seq = 3; // used to resume if reconnecting
+}
+
+message ServerEvent {
+  uint64 seq = 1; // running sequence number
+
+  oneof event {
+    Question question = 2;
+    RoundEnd round_end = 3;
+  }
+}
+
+message Question {
+  string question_id = 1;
+  string text = 2;
+  repeated string choices = 3;
+  int32 seconds_left = 4;
+}
+
+message Answer {
+  string player_id = 1;
+  string game_id = 2;
+  string question_id = 3;
+  string answer_id = 4;   // unique identifier for idempotency
+  int32 choice_idx = 5;   // index of the chosen answer
+}
+
+message Ack {
+  bool accepted = 1;
+  string reason = 2;
+  int32 total = 3; // player's total score after this answer
+}
+
+message RoundEnd {}
